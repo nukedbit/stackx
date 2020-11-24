@@ -9,7 +9,7 @@ namespace StackX.Pipeline
     /// In the Execute override you can write your own task logic
     /// </summary>
     /// <typeparam name="TSArgs"></typeparam>
-    public abstract class PipeTask<TSArgs> : CanExecutePipeElement
+    public abstract class PipeElement<TSArgs> : CanExecutePipeElement
     {
         /// <summary>
         /// Determine if the task can be executed by default it's always true

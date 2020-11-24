@@ -31,7 +31,7 @@ namespace StackX.Pipeline
         private PipeElementResult OnRestart(PipeRestartResult result, PipelineState state)
         {
             if (_restartCountLimit.HasValue && _defaultStatusManager.RestartCount > _restartCountLimit.Value - 1)
-                return new PipeRestartLimitReachedResult(result);
+                return new PipeRestartLimitReachedResult { Result = result };
             var value = TryExecuteRestartFilter(result, state);
             _defaultStatusManager.IncRestartCount();
             return RunInternal(@value);

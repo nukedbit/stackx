@@ -1,75 +1,40 @@
 ﻿namespace StackX.Pipeline
 {
-    public abstract class PipeElementResult
+    public abstract record PipeElementResult
     {
-        public object Result { get; private set; }
-
-        protected PipeElementResult(object result)
-        {
-            Result = result;
-        }
+        public virtual object Result { get; init; }
 
         public static PipeElementResult Success(object @object)
         {
-            return new PipeSuccessResult(@object);
+            return new PipeSuccessResult { Result = @object};
         }
 
         public static PipeElementResult Error(object @error, object @object = null)
         {
-            return new PipeErrorResult(@object, @error);
+            return new PipeErrorResult{ Result = @object, ErrorObject = error};
         }
 
         public static PipeElementResult GoToEnd(object result)
         {
-            return new PipeGoToEndResult(result);
+            return new PipeGoToEndResult { Result = result};
         }
 
         public static PipeElementResult Restart(object result)
         {
-            return new PipeRestartResult(result);
+            return new PipeRestartResult {Result = result};
         }
     }
 
-    public class PipeErrorResult : PipeElementResult
+    public record PipeErrorResult : PipeElementResult
     {
-        public object ErrorObject { get; private set; }
-
-        public PipeErrorResult(object result, object errorObject) : base(result)
-        {
-            ErrorObject = errorObject;
-        }
+        public object ErrorObject { get; init; }
     }
 
-    public class PipeSuccessResult : PipeElementResult
-    {
-        public PipeSuccessResult(object result) : base(result)
-        {
+    public record PipeSuccessResult : PipeElementResult;
 
-        }
-    }
+    public record PipeGoToEndResult : PipeSuccessResult;
 
+    public record PipeRestartResult : PipeElementResult;
 
-    public class PipeGoToEndResult : PipeSuccessResult
-    {
-        public PipeGoToEndResult(object result) : base(result)
-        {
-        }
-    }
-
-    public class PipeRestartResult : PipeElementResult
-    {
-        public PipeRestartResult(object result) : base(result)
-        {
-
-        }
-    }
-
-    public class PipeRestartLimitReachedResult : PipeElementResult
-    {
-        internal PipeRestartLimitReachedResult(PipeElementResult lastResult)
-            : base(lastResult)
-        {
-
-        }
-    }
+    public record PipeRestartLimitReachedResult : PipeElementResult;
 }

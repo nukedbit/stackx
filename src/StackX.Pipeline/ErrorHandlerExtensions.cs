@@ -9,7 +9,6 @@ namespace StackX.Pipeline
             return PipeElementResult.Success(result);
         }
 
-        
         public static PipeElementResult Error<TResult>(this ErrorHandler errorHandler, [NotNull]TResult error)
         {
             return PipeElementResult.Error(error);
