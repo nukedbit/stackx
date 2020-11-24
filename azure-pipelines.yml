@@ -30,8 +30,8 @@ steps:
   displayName: 'Install Nuke.GlobalTool'
   inputs:
     command: 'custom'
-    custom: 'tool install'
-    arguments: 'Nuke.GlobalTool --global'
+    custom: 'tool'
+    arguments: 'install Nuke.GlobalTool --global'
 - task: Bash@3
   continueOnError: true
   displayName: 'Clear NuGet Caches'
