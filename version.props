@@ -6,7 +6,7 @@
         <Authors>nukedbit</Authors>
         <Company>NukedBit</Company>
         <VersionPrefix>1.0.0</VersionPrefix>
-        <PackageDescription>StackX is a comprehensive framework for building blazor apps with servicestack</PackageDescription> 
+        <PackageDescription>StackX is an extension package for servicestack</PackageDescription> 
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>

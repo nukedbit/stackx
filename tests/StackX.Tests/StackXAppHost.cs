@@ -21,7 +21,7 @@ namespace StackX.Tests
         public StackXAppHost() : base(nameof(FeaturesTests),
             typeof(StackXAppHostBase).Assembly)
         {
-            
+            Licensing.RegisterLicense(Environment.GetEnvironmentVariable("SERVICESTACK_LICENSE"));
         }
         
         public override void Configure(Container container)
