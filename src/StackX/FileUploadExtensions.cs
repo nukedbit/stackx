@@ -17,7 +17,7 @@ namespace StackX.ServiceInterface
         public static string GetDefaultUploadFullFilePath(this ServiceConfig config , string fileName, string subFolder = null)
         {
             var root = config.DefaultUploadsPath.Replace("~", "").MapServerPath();
-            var invalidParts = new[] {"../", "..\\", "~", "./", ".\\"};
+            var invalidParts = new[] {"../", "..\\", "~", "./", ".\\", "$"};
 
             if (subFolder is null)
             {
