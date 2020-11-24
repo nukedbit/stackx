@@ -22,8 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\StackX.Excel.Syncfusion\StackX.Excel.Syncfusion.csproj" />
-      <ProjectReference Include="..\..\src\StackX.Excel\StackX.Excel.csproj" />
       <ProjectReference Include="..\..\src\StackX\StackX.csproj" />
       <ProjectReference Include="..\..\src\StackX.ServiceModel\StackX.ServiceModel.csproj" />
     </ItemGroup>
