@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="version.props" />
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<RestoreAdditionalProjectSources>
+			https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
+			https://dotnet.myget.org/F/blazor-dev/api/v3/index.json;
+		</RestoreAdditionalProjectSources>
+
+		<RazorLangVersion>3.0</RazorLangVersion>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>		
+	</PropertyGroup>
+</Project>

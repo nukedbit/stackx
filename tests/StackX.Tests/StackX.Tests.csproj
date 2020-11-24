@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework> 
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
+        <PackageReference Include="nunit" Version="3.12.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-alpha.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
+        <PackageReference Include="ServiceStack" Version="5.10.1" />
+        <PackageReference Include="ServiceStack.Kestrel" Version="5.10.1" />
+        <PackageReference Include="ServiceStack.Mvc" Version="5.10.1" />
+        <PackageReference Include="ServiceStack.OrmLite" Version="5.10.1" />
+        <PackageReference Include="ServiceStack.Server" Version="5.10.1" />
+
+        <PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="5.10.1" />
+        <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.10.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\StackX.Excel.Syncfusion\StackX.Excel.Syncfusion.csproj" />
+      <ProjectReference Include="..\..\src\StackX.Excel\StackX.Excel.csproj" />
+      <ProjectReference Include="..\..\src\StackX\StackX.csproj" />
+      <ProjectReference Include="..\..\src\StackX.ServiceModel\StackX.ServiceModel.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="simple_import.xlsx">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="ricci_use_case.xlsx">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+</Project>

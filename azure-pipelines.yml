@@ -1,0 +1,52 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+- development
+pr:
+- master
+
+pool:
+  name: "Default"
+
+variables:
+  buildConfiguration: 'Release'
+steps:
+- task: UseDotNet@2
+  displayName: "install .net 3.1"
+  inputs:
+    packageType: 'runtime'
+    version: '3.1.8'
+- task: UseDotNet@2
+  displayName: "install .net from global json"
+  inputs:
+    packageType: 'sdk'
+    useGlobalJson: true
+  
+- task: DotnetGlobalToolInstaller@0
+  displayName: 'Installing Nuke Global Tool'
+  inputs:
+    name: 'nuke.globaltool'
+    versionSpec: '0.24.11'
+- task: Bash@3
+  continueOnError: true
+  displayName: 'Clear NuGet Caches'
+  inputs:
+    targetType: 'inline'
+    script: 'dotnet nuget locals all --clear'
+- task: Bash@3
+  displayName: 'Build'
+  continueOnError: true
+  inputs:
+    filePath: './build.sh' 
+    arguments: '-target PushNuGet'
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/TestResults.xml'
+    mergeTestResults: true
+    searchFolder: '$(System.DefaultWorkingDirectory)/tests'
+    testRunTitle: 'StackX Tests'

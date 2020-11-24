@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\..\version.props" />
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="ServiceStack.Interfaces" Version="5.10.1" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\StackX.Common\StackX.Common.csproj" />
+    </ItemGroup>
+</Project>

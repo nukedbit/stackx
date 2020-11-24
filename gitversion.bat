@@ -1,0 +1,1 @@
+.\tools\GitVersion.CommandLine.5.2.4\tools\gitversion.exe %*
