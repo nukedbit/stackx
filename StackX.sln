@@ -26,9 +26,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.ServiceModel", "src\StackX.ServiceModel\StackX.ServiceModel.csproj", "{7D1AC13F-3524-4A48-BBBA-D3CA70F07FA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Common", "StackX.Common\StackX.Common.csproj", "{64700865-1EBF-4096-B673-DD8D64FD7E7B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.TestSelfHost", "src\StackX.TestSelfHost\StackX.TestSelfHost.csproj", "{5B0224FB-7371-4AD7-8A40-3133A6E66DC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Common", "src\StackX.Common\StackX.Common.csproj", "{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,14 +50,14 @@ Global
 		{7D1AC13F-3524-4A48-BBBA-D3CA70F07FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D1AC13F-3524-4A48-BBBA-D3CA70F07FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D1AC13F-3524-4A48-BBBA-D3CA70F07FA6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{64700865-1EBF-4096-B673-DD8D64FD7E7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{64700865-1EBF-4096-B673-DD8D64FD7E7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{64700865-1EBF-4096-B673-DD8D64FD7E7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{64700865-1EBF-4096-B673-DD8D64FD7E7B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5B0224FB-7371-4AD7-8A40-3133A6E66DC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5B0224FB-7371-4AD7-8A40-3133A6E66DC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B0224FB-7371-4AD7-8A40-3133A6E66DC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B0224FB-7371-4AD7-8A40-3133A6E66DC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,6 +8,6 @@
         <PackageReference Include="ServiceStack.Interfaces" Version="5.10.2" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\StackX.Common\StackX.Common.csproj" />
+      <ProjectReference Include="..\StackX.Common\StackX.Common.csproj" />
     </ItemGroup>
 </Project>
