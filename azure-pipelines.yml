@@ -26,12 +26,12 @@ steps:
   inputs:
     packageType: 'sdk'
     useGlobalJson: true
-  
-- task: DotnetGlobalToolInstaller@0
-  displayName: 'Installing Nuke Global Tool'
+- task: DotNetCoreCLI@2
+  displayName: 'Install Nuke.GlobalTool'
   inputs:
-    name: 'nuke.globaltool'
-    versionSpec: '0.24.11'
+    command: 'custom'
+    custom: 'tool install'
+    arguments: 'Nuke.GlobalTool --global'
 - task: Bash@3
   continueOnError: true
   displayName: 'Clear NuGet Caches'
