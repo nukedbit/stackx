@@ -10,7 +10,7 @@ pr:
 - master
 
 pool:
-  name: "Default"
+  vmImage: 'ubuntu-18.04'
 
 variables:
   buildConfiguration: 'Release'
