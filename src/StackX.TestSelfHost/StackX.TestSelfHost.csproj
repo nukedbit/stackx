@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup> 
-    <PackageReference Include="ServiceStack" Version="5.10.1" /> 
-    <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.10.1" />
-    <PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="5.10.1" />
+    <PackageReference Include="ServiceStack" Version="5.10.2" /> 
+    <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.10.2" />
+    <PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="5.10.2" />
   </ItemGroup>
 
   <ItemGroup>

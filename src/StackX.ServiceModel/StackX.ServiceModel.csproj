@@ -5,7 +5,7 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="ServiceStack.Interfaces" Version="5.10.1" />
+        <PackageReference Include="ServiceStack.Interfaces" Version="5.10.2" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\StackX.Common\StackX.Common.csproj" />
