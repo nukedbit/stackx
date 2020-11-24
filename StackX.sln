@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.TestSelfHost", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Common", "src\StackX.Common\StackX.Common.csproj", "{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Pipeline", "src\StackX.Pipeline\StackX.Pipeline.csproj", "{C2959274-1356-4877-BD41-EA42521B381A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2959274-1356-4877-BD41-EA42521B381A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2959274-1356-4877-BD41-EA42521B381A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2959274-1356-4877-BD41-EA42521B381A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2959274-1356-4877-BD41-EA42521B381A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
