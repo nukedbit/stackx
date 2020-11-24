@@ -12,5 +12,4 @@ namespace StackX.ServiceModel
     public interface ICrudListResponse<TTable> : ICrudListResponse<int, TTable>
     { 
     }
-
 }
