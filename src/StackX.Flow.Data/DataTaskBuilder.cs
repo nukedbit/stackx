@@ -1,14 +1,11 @@
 ﻿using ServiceStack;
 using ServiceStack.OrmLite;
-using ServiceStack.OrmLite.Dapper;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace StackX.Pipeline.Data
+namespace StackX.Flow.Data
 {
     public record QueryBuilderArgs<TQuery, TArgs>(SqlExpression<TQuery> Expression, TArgs PipeArgs);
 
@@ -62,7 +59,7 @@ namespace StackX.Pipeline.Data
     
     public interface IQueryPipeBuilder
     {
-        PipeElement Build();
+        FlowElement Build();
     }
 
     internal class DataTaskBuilderRead<TTable,TArgs> : DataTaskBuilder, IReadQueryBuilder<TTable, TArgs>, IReadQueryModifiers<TTable, TArgs>, IQueryPipeBuilder
@@ -115,7 +112,7 @@ namespace StackX.Pipeline.Data
         }
 
 
-        public PipeElement Build()
+        public FlowElement Build()
         {
             if (_queryBuilder is not null && _sqlSelect is not null)
             {
@@ -126,7 +123,7 @@ namespace StackX.Pipeline.Data
     }
 
 
-    internal class DataQueryElement<TTable, TArgs> : PipeElement<TArgs>
+    internal class DataQueryElement<TTable, TArgs> : FlowElement<TArgs>
     {
         private IDbConnection? _connection;
         private readonly Func<QueryBuilderArgs<TTable, TArgs>, SqlExpression<TTable>> _queryBuilder;
@@ -153,7 +150,7 @@ namespace StackX.Pipeline.Data
             }
         }
         
-        protected override async Task<PipeElementResult> OnExecuteAsync(TArgs args, PipelineState state)
+        protected override async Task<FlowElementResult> OnExecuteAsync(TArgs args, FlowState state)
         {
             var expression = _queryBuilder(new QueryBuilderArgs<TTable, TArgs>(Db.From<TTable>(), args));
 
@@ -194,16 +191,16 @@ namespace StackX.Pipeline.Data
             {
                 if ((result is IList {Count: 0}) || (result is TArgs[] {Length: 0}))
                 {
-                    return new PipeErrorResult {ErrorObject = _onEmptyOrNullRaiseError};   
+                    return new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError};   
                 }
 
                 if (result is null)
                 {
-                    return new PipeErrorResult {ErrorObject = _onEmptyOrNullRaiseError};
+                    return new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError};
                 }
             }
             
-            return new PipeSuccessResult
+            return new FlowSuccessResult
             {
                 Result = result
             };

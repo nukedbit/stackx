@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StackX.Pipeline
+namespace StackX.Flow
 {
     /// <summary>
     /// This is the base class for all pipe tasks, each one can override CanExecute, to indicated if
@@ -10,7 +10,7 @@ namespace StackX.Pipeline
     /// In the Execute override you can write your own task logic
     /// </summary>
     /// <typeparam name="TSArgs"></typeparam>
-    public abstract class PipeElement<TSArgs> : CanExecutePipeElement
+    public abstract class FlowElement<TSArgs> : CanExecuteFlowElement
     {
         /// <summary>
         /// Determine if the task can be executed by default it's always true
@@ -18,12 +18,12 @@ namespace StackX.Pipeline
         /// <param name="args">Task Argument Object</param>
         /// <param name="state">Pipe Status Object</param>
         /// <returns></returns>
-        protected virtual bool CanExecute(TSArgs args, PipelineState state)
+        protected virtual bool CanExecute(TSArgs args, FlowState state)
         {
             return true;
         }
         
-        internal override bool CanExecuteInternal(object args, PipelineState state)
+        internal override bool CanExecuteInternal(object args, FlowState state)
         {
             if (args is TSArgs tsArgs)
                 return CanExecute(tsArgs, state);
@@ -40,9 +40,9 @@ namespace StackX.Pipeline
         /// <param name="args">Task Argument</param>
         /// <param name="state">Pipe state</param>
         /// <returns></returns>
-        protected abstract Task<PipeElementResult> OnExecuteAsync(TSArgs args, PipelineState state);
+        protected abstract Task<FlowElementResult> OnExecuteAsync(TSArgs args, FlowState state);
         
-        internal override async Task<PipeElementResult> ExecuteInternalAsync(object args, PipelineState state)
+        internal override async Task<FlowElementResult> ExecuteInternalAsync(object args, FlowState state)
         {
             try
             {

@@ -6,12 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\StackX.Pipeline\StackX.Pipeline.csproj" />
+      <PackageReference Include="ServiceStack" Version="5.10.2" />
+      <PackageReference Include="ServiceStack.OrmLite" Version="5.10.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="ServiceStack" Version="5.10.2" />
-      <PackageReference Include="ServiceStack.OrmLite" Version="5.10.2" />
+      <ProjectReference Include="..\StackX.Flow\StackX.Flow.csproj" />
     </ItemGroup>
 
 </Project>

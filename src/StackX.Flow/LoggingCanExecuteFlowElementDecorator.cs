@@ -3,14 +3,14 @@ using ServiceStack.Text;
 using System;
 using System.Threading.Tasks;
 
-namespace StackX.Pipeline
+namespace StackX.Flow
 {
-    internal class LoggingCanExecutePipeElementDecorator : CanExecutePipeElement, ILoggingPipeElementDecorator
+    internal class LoggingCanExecuteFlowElementDecorator : CanExecuteFlowElement, ILoggingFlowElementDecorator
     {
         private readonly ILog _logger;
-        private readonly CanExecutePipeElement _element;
+        private readonly CanExecuteFlowElement _element;
 
-        public LoggingCanExecutePipeElementDecorator(CanExecutePipeElement element)
+        public LoggingCanExecuteFlowElementDecorator(CanExecuteFlowElement element)
         {
             _logger = LogManager.GetLogger(element.GetType());
             _element = element;
@@ -21,7 +21,7 @@ namespace StackX.Pipeline
 
         public bool IsLoggingEnabled { get; private set; }
 
-        internal override async Task<PipeElementResult> ExecuteInternalAsync(object args, PipelineState state)
+        internal override async Task<FlowElementResult> ExecuteInternalAsync(object args, FlowState state)
         {
             if (!IsLoggingEnabled)
                 return await _element.ExecuteInternalAsync(args, state);
@@ -40,7 +40,7 @@ namespace StackX.Pipeline
             }
         }
 
-        internal override bool CanExecuteInternal(object args, PipelineState state)
+        internal override bool CanExecuteInternal(object args, FlowState state)
         {
             if (!IsLoggingEnabled)
                 return _element.CanExecuteInternal(args, state);

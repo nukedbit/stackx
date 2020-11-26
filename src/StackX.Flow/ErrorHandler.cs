@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace StackX.Pipeline
+namespace StackX.Flow
 {
     public abstract class ErrorHandler
     {
-        protected virtual Task<PipeElementResult> OnExecuteAsync(PipeErrorResult error)
+        protected virtual Task<FlowElementResult> OnExecuteAsync(FlowErrorResult error)
         {
             throw new NotImplementedException();
         }
 
-        internal Task<PipeElementResult> ExecuteInternalAsync(PipeErrorResult error) =>
+        internal Task<FlowElementResult> ExecuteInternalAsync(FlowErrorResult error) =>
             OnExecuteAsync(error);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StackX.Pipeline.Converters
+namespace StackX.Flow.Converters
 {
     public abstract class Converter
     {

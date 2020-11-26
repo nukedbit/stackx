@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StackX.Pipeline
+namespace StackX.Flow
 {
     public class DefaultStatusManager
     {
@@ -17,12 +17,12 @@ namespace StackX.Pipeline
             InitialInput = initialInput ?? throw new NullReferenceException("Initial input can't be null");
         }
 
-        protected virtual PipelineState OnBuildPipelineState(PipeElementResult result)
+        protected virtual FlowState OnBuildPipelineState(FlowElementResult result)
         {
-            return new PipelineState(RestartCount, InitialInput);
+            return new(RestartCount, InitialInput);
         }
 
-        internal PipelineState BuildPipelineState(PipeElementResult result)
+        internal FlowState BuildPipelineState(FlowElementResult result)
         {
             return OnBuildPipelineState(result);
         }

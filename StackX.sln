@@ -30,13 +30,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.TestSelfHost", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Common", "src\StackX.Common\StackX.Common.csproj", "{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Pipeline", "src\StackX.Pipeline\StackX.Pipeline.csproj", "{C2959274-1356-4877-BD41-EA42521B381A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Flow", "src\StackX.Flow\StackX.Flow.csproj", "{C2959274-1356-4877-BD41-EA42521B381A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Pipeline.Data", "src\StackX.Pipeline.Data\StackX.Pipeline.Data.csproj", "{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Flow.Data", "src\StackX.Flow.Data\StackX.Flow.Data.csproj", "{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{262EAEE7-065A-4223-8C43-17645B4A2D35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Pipeline.Tests", "tests\StackX.Pipeline.Tests\StackX.Pipeline.Tests.csproj", "{0CA105B0-35EB-41DA-8036-A85A340E3444}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Flow.Tests", "tests\StackX.Flow.Tests\StackX.Flow.Tests.csproj", "{0CA105B0-35EB-41DA-8036-A85A340E3444}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

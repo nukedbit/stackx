@@ -1,6 +1,6 @@
-﻿namespace StackX.Pipeline
+﻿namespace StackX.Flow
 {
-    internal interface ILoggingPipeElementDecorator
+    internal interface ILoggingFlowElementDecorator
     {
         void SetLogging(bool enable);
         bool IsLoggingEnabled { get; }

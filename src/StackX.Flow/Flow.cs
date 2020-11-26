@@ -2,17 +2,17 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace StackX.Pipeline
+namespace StackX.Flow
 {
-    class Pipeline<TInput> : IPipeline<TInput>
+    class Flow<TInput> : IFlowElement<TInput>
     {
-        private readonly List<PipeElement> _elements;
+        private readonly List<FlowElement> _elements;
         private readonly ErrorHandler _errorHandler;
         private readonly RestartFilter? _restartFilter;
         private readonly DefaultStatusManager _defaultStatusManager;
         private readonly int? _restartCountLimit;
 
-        internal Pipeline(List<PipeElement> elements, ErrorHandler errorHandler,
+        internal Flow(List<FlowElement> elements, ErrorHandler errorHandler,
             RestartFilter? restartFilter, DefaultStatusManager defaultStatusManager, int? restartCountLimit)
         {
             _elements = elements;
@@ -22,23 +22,23 @@ namespace StackX.Pipeline
             _restartCountLimit = restartCountLimit;
         }
 
-        public async Task<PipeElementResult> RunAsync(TInput input)
+        public async Task<FlowElementResult> RunAsync(TInput input)
         {
             _defaultStatusManager.Reset();
             _defaultStatusManager.SetInitialInput(input);
             return await RunInternalAsync(input);
         }
 
-        private async Task<PipeElementResult> OnRestartAsync(PipeRestartResult result, PipelineState state)
+        private async Task<FlowElementResult> OnRestartAsync(FlowRestartResult result, FlowState state)
         {
             if (_restartCountLimit.HasValue && _defaultStatusManager.RestartCount > _restartCountLimit.Value - 1)
-                return new PipeRestartLimitReachedResult { Result = result };
+                return new FlowRestartLimitReachedResult { Result = result };
             var value = TryExecuteRestartFilter(result, state);
             _defaultStatusManager.IncRestartCount();
             return await RunInternalAsync(@value);
         }
 
-        private object TryExecuteRestartFilter(PipeRestartResult result, PipelineState state)
+        private object TryExecuteRestartFilter(FlowRestartResult result, FlowState state)
         {
             var @value = result.Result;
             if (_restartFilter != null)
@@ -48,9 +48,9 @@ namespace StackX.Pipeline
             return value;
         }
 
-        private async Task<PipeElementResult> RunInternalAsync(object input)
+        private async Task<FlowElementResult> RunInternalAsync(object input)
         {
-            PipeElementResult result = new PipeSuccessResult {Result = input};
+            FlowElementResult result = new FlowSuccessResult {Result = input};
             var pipeState = _defaultStatusManager.BuildPipelineState(result);
             foreach (var element in _elements)
             {
@@ -60,10 +60,10 @@ namespace StackX.Pipeline
                     continue;
                 result = await element.ExecuteInternalAsync(result.Result, pipeState);
 
-                if (result is PipeErrorResult errorResult)
+                if (result is FlowErrorResult errorResult)
                 {
                     result = await _errorHandler.ExecuteInternalAsync(errorResult);
-                    if (result is PipeErrorResult)
+                    if (result is FlowErrorResult)
                     {
                         break;
                     }
@@ -76,21 +76,21 @@ namespace StackX.Pipeline
                 pipeState = _defaultStatusManager.BuildPipelineState(result);
             }
 
-            if (result is PipeRestartResult restartResult)
+            if (result is FlowRestartResult restartResult)
                 result = await OnRestartAsync(restartResult, pipeState);
             return result;
         }
 
-        private static bool IsExitResult(PipeElementResult result)
+        private static bool IsExitResult(FlowElementResult result)
         {
-            return result is PipeGoToEndResult || result is PipeRestartResult || result is PipeRestartLimitReachedResult;
+            return result is FlowGoToEndResult || result is FlowRestartResult || result is FlowRestartLimitReachedResult;
         }
 
-        private static bool CheckCanExecute(PipeElement element, object currentInput, PipelineState state)
+        private static bool CheckCanExecute(FlowElement element, object currentInput, FlowState state)
         {
             try
             {
-                if (element is CanExecutePipeElement canExecute)
+                if (element is CanExecuteFlowElement canExecute)
                 {
                     return canExecute.CanExecuteInternal(currentInput, state);
                 }

@@ -8,7 +8,8 @@ using Moq.Protected;
 using NUnit.Framework;
 using ServiceStack.DataAnnotations;
 using ServiceStack.OrmLite;
-using StackX.Pipeline.Data;
+using StackX.Flow;
+using StackX.Flow.Data;
 
 namespace StackX.Pipeline.Tests
 {
@@ -17,17 +18,17 @@ namespace StackX.Pipeline.Tests
         [Test]
         public async Task ExecutePipeSuccess()
         {
-            var element = new Mock<PipeElement<string>>();
+            var element = new Mock<FlowElement<string>>();
             element
                 .Protected()
-                .Setup<bool>("CanExecute", ItExpr.IsAny<string>(), ItExpr.IsAny<PipelineState>())
+                .Setup<bool>("CanExecute", ItExpr.IsAny<string>(), ItExpr.IsAny<FlowState>())
                 .Returns(true);
             element
                 .Protected()
-                .Setup<Task<PipeElementResult>>("OnExecuteAsync", ItExpr.IsAny<string>(), ItExpr.IsAny<PipelineState>())
-                .ReturnsAsync(new PipeSuccessResult() {Result = "res"});
+                .Setup<Task<FlowElementResult>>("OnExecuteAsync", ItExpr.IsAny<string>(), ItExpr.IsAny<FlowState>())
+                .ReturnsAsync(new FlowSuccessResult() {Result = "res"});
             
-             var builder = new PipelineBuilder()
+             var builder = new FlowBuilder()
                  .Add(element.Object);
 
              var pipeline = builder.Build<string>();
@@ -38,9 +39,9 @@ namespace StackX.Pipeline.Tests
         }
 
 
-        class FailingPipeElement : PipeElement<string>
+        class FailingFlowElement : FlowElement<string>
         {
-            protected override Task<PipeElementResult> OnExecuteAsync(string args, PipelineState state)
+            protected override Task<FlowElementResult> OnExecuteAsync(string args, FlowState state)
             {
                 throw new Exception();
             }
@@ -49,8 +50,8 @@ namespace StackX.Pipeline.Tests
         [Test]
         public async Task ExecutePipeFailShouldReturnError()
         {
-            var builder = new PipelineBuilder()
-                .Add(new FailingPipeElement());
+            var builder = new FlowBuilder()
+                .Add(new FailingFlowElement());
 
             var pipeline = builder.Build<string>();
 
@@ -58,7 +59,7 @@ namespace StackX.Pipeline.Tests
 
             result
                 .Should()
-                .BeOfType<PipeErrorResult>();
+                .BeOfType<FlowErrorResult>();
         }
 
         class Person
@@ -90,7 +91,7 @@ namespace StackX.Pipeline.Tests
                 Name = "Luigi"
             });
             
-            var pipeline = new PipelineBuilder()
+            var pipeline = new FlowBuilder()
                 .Add(
                     DataTaskBuilder.New()
                         .SetConnection(db)
@@ -103,7 +104,7 @@ namespace StackX.Pipeline.Tests
             var result = await pipeline.RunAsync(2);
 
             result.Should()
-                .BeOfType<PipeSuccessResult>();
+                .BeOfType<FlowSuccessResult>();
             result.Result.Should()
                 .BeOfType<List<Person>>()
                 .Which.Single()
@@ -118,7 +119,7 @@ namespace StackX.Pipeline.Tests
             var db = await factory.OpenDbConnectionAsync();
             db.CreateTable<Person>();
             
-            var pipeline = new PipelineBuilder()
+            var pipeline = new FlowBuilder()
                 .Add(
                     DataTaskBuilder.New()
                         .SetConnection(db)
@@ -132,7 +133,7 @@ namespace StackX.Pipeline.Tests
             var result = await pipeline.RunAsync(2);
 
             result.Should()
-                .BeOfType<PipeErrorResult>()
+                .BeOfType<FlowErrorResult>()
                 .Which.ErrorObject.Should().Be("no results found");
         }
         
@@ -159,7 +160,7 @@ namespace StackX.Pipeline.Tests
                 Name = "Luigi"
             });
             
-            var pipeline = new PipelineBuilder()
+            var pipeline = new FlowBuilder()
                 .Add(
                     DataTaskBuilder.New()
                         .SetConnection(db)
@@ -172,7 +173,7 @@ namespace StackX.Pipeline.Tests
             var result = await pipeline.RunAsync(2);
 
             result.Should()
-                .BeOfType<PipeSuccessResult>();
+                .BeOfType<FlowSuccessResult>();
             result.Result.Should()
                 .BeOfType<Person>();
         }

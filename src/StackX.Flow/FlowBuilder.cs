@@ -2,23 +2,23 @@
 using System;
 using System.Collections.Generic;
 
-namespace StackX.Pipeline
+namespace StackX.Flow
 {
-    public sealed class PipelineBuilder
+    public sealed class FlowBuilder
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(PipelineBuilder));
-        readonly List<PipeElement> _pipelineElements = new();
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(FlowBuilder));
+        readonly List<FlowElement> _pipelineElements = new();
         private ErrorHandler _errorHandler;
         private RestartFilter? _restartFilter;
         private int? _restartCountLimit;
         private DefaultStatusManager _defaultStatusManager;
 
 
-        public PipelineBuilder() : this(false)
+        public FlowBuilder() : this(false)
         {
             
         }
-        public PipelineBuilder(bool enableLogging)
+        public FlowBuilder(bool enableLogging)
         {
             IsLoggingEnabled = enableLogging;
             _errorHandler = new DefaultErrorHandler();
@@ -32,75 +32,75 @@ namespace StackX.Pipeline
             IsLoggingEnabled = enable;
             foreach (var el in _pipelineElements)
             {
-                if (el is ILoggingPipeElementDecorator decorator)
+                if (el is ILoggingFlowElementDecorator decorator)
                 {
                     decorator.SetLogging(enable);
                 }
             }
         }
 
-        private void AddDecorated(PipeElement element)
+        private void AddDecorated(FlowElement element)
         {
             if (_logger is null)
             {
                 _pipelineElements.Add(element);
                 return;
             }
-            if (element is CanExecutePipeElement canExecutePipeElement)
+            if (element is CanExecuteFlowElement canExecutePipeElement)
             {
-                var decorator = new LoggingCanExecutePipeElementDecorator(canExecutePipeElement);
+                var decorator = new LoggingCanExecuteFlowElementDecorator(canExecutePipeElement);
                 decorator.SetLogging(IsLoggingEnabled);
                 _pipelineElements.Add(decorator);
             }
             else
             {
-                var decorator = new LoggingPipeElementDecorator(element);
+                var decorator = new LoggingFlowElementDecorator(element);
                 decorator.SetLogging(IsLoggingEnabled);
                 _pipelineElements.Add(decorator);
             }
         }
 
-        public PipelineBuilder Add(PipeElement element)
+        public FlowBuilder Add(FlowElement element)
         {
             AddDecorated(element);
             return this;
         }
-        public PipelineBuilder Add<TElement>()
-            where TElement : PipeElement
+        public FlowBuilder Add<TElement>()
+            where TElement : FlowElement
         {
             var newElement = Activator.CreateInstance<TElement>();
             AddDecorated(newElement);
             return this;
         }
 
-        public PipelineBuilder OnError(ErrorHandler errorHandler)
+        public FlowBuilder OnError(ErrorHandler errorHandler)
         {
             _errorHandler = errorHandler;
             return this;
         }
 
-        public PipelineBuilder SetRestartLimit(int restartLimit)
+        public FlowBuilder SetRestartLimit(int restartLimit)
         {
             _restartCountLimit = restartLimit;
             return this;
         }
 
-        public PipelineBuilder OnRestart(RestartFilter restartFilter)
+        public FlowBuilder OnRestart(RestartFilter restartFilter)
         {
             _restartFilter = restartFilter;
             return this;
         }
 
-        public PipelineBuilder SetStatusManager(DefaultStatusManager defaultStatusManager)
+        public FlowBuilder SetStatusManager(DefaultStatusManager defaultStatusManager)
         {
             _defaultStatusManager = defaultStatusManager;
             return this;
         }
 
-        public IPipeline<TInput> Build<TInput>()
+        public IFlowElement<TInput> Build<TInput>()
         {
             if (_errorHandler is null) throw new NullReferenceException("Error handler should not be null");
-            return new Pipeline<TInput>(_pipelineElements, _errorHandler, 
+            return new Flow<TInput>(_pipelineElements, _errorHandler, 
                 _restartFilter, _defaultStatusManager, _restartCountLimit);
         }
     }

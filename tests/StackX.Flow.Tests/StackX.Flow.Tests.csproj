@@ -16,8 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\StackX.Pipeline.Data\StackX.Pipeline.Data.csproj" />
-      <ProjectReference Include="..\..\src\StackX.Pipeline\StackX.Pipeline.csproj" />
+      <ProjectReference Include="..\..\src\StackX.Flow.Data\StackX.Flow.Data.csproj" />
+      <ProjectReference Include="..\..\src\StackX.Flow\StackX.Flow.csproj" />
     </ItemGroup>
 
 </Project>
