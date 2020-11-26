@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Moq.Protected;
@@ -14,7 +15,7 @@ namespace StackX.Pipeline.Tests
     public class PipeLinesTests
     {
         [Test]
-        public void ExecutePipeSuccess()
+        public async Task ExecutePipeSuccess()
         {
             var element = new Mock<PipeElement<string>>();
             element
@@ -23,16 +24,15 @@ namespace StackX.Pipeline.Tests
                 .Returns(true);
             element
                 .Protected()
-                .Setup<PipeElementResult>("Execute", ItExpr.IsAny<string>(), ItExpr.IsAny<PipelineState>())
-                .Returns(new PipeSuccessResult() {Result = "res"});
+                .Setup<Task<PipeElementResult>>("OnExecuteAsync", ItExpr.IsAny<string>(), ItExpr.IsAny<PipelineState>())
+                .ReturnsAsync(new PipeSuccessResult() {Result = "res"});
             
-                
              var builder = new PipelineBuilder()
                  .Add(element.Object);
 
              var pipeline = builder.Build<string>();
 
-             var result = pipeline.Run("test");
+             var result = await pipeline.RunAsync("test");
 
              result.Result.Should().Be("res");
         }
@@ -40,21 +40,21 @@ namespace StackX.Pipeline.Tests
 
         class FailingPipeElement : PipeElement<string>
         {
-            protected override PipeElementResult Execute(string args, PipelineState state)
+            protected override Task<PipeElementResult> OnExecuteAsync(string args, PipelineState state)
             {
                 throw new Exception();
             }
         }
         
         [Test]
-        public void ExecutePipeFailShouldReturnError()
+        public async Task ExecutePipeFailShouldReturnError()
         {
             var builder = new PipelineBuilder()
                 .Add(new FailingPipeElement());
 
             var pipeline = builder.Build<string>();
 
-            var result = pipeline.Run("test");
+            var result = await pipeline.RunAsync("test");
 
             result
                 .Should()
@@ -69,18 +69,17 @@ namespace StackX.Pipeline.Tests
         }
         
         [Test]
-        public void ExecuteQueryTaskReturnOneResult()
+        public async Task ExecuteQueryTaskReturnOneResult()
         {
             var factory = new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider);
 
-            var db = factory.OpenDbConnection();
+            var db = await factory.OpenDbConnectionAsync();
             db.CreateTable<Person>();
             db.Save(new Person()
             {
                 Name = "Mario"
             });
-            
-            
+
             db.Save(new Person()
             {
                 Name = "Princess"
@@ -100,7 +99,7 @@ namespace StackX.Pipeline.Tests
                         .Build()
                 ).Build<int>();
 
-            var result = pipeline.Run(2);
+            var result = await pipeline.RunAsync(2);
 
             result.Should()
                 .BeOfType<PipeSuccessResult>();
@@ -111,11 +110,11 @@ namespace StackX.Pipeline.Tests
         }
         
         [Test]
-        public void ExecuteQueryTaskOnEmptyResultReturnError()
+        public async Task ExecuteQueryTaskOnEmptyResultReturnError()
         {
             var factory = new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider);
 
-            var db = factory.OpenDbConnection();
+            var db = await factory.OpenDbConnectionAsync();
             db.CreateTable<Person>();
             
             var pipeline = new PipelineBuilder()
@@ -128,7 +127,7 @@ namespace StackX.Pipeline.Tests
                         .Build()
                 ).Build<int>();
 
-            var result = pipeline.Run(2);
+            var result = await pipeline.RunAsync(2);
 
             result.Should()
                 .BeOfType<PipeErrorResult>()

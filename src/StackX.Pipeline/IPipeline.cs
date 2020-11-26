@@ -1,7 +1,9 @@
-﻿namespace StackX.Pipeline
+﻿using System.Threading.Tasks;
+
+namespace StackX.Pipeline
 {
     public interface IPipeline<in TInput>
     {
-        PipeElementResult Run(TInput input);
+        Task<PipeElementResult> RunAsync(TInput input);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using StackX.Pipeline.Converters;
+using System.Threading.Tasks;
 
 namespace StackX.Pipeline
 {
@@ -6,6 +7,6 @@ namespace StackX.Pipeline
     {
         protected virtual Converter[] Converters => new Converter[0];
 
-        internal abstract PipeElementResult ExecuteInternal(object args, PipelineState state);       
+        internal abstract Task<PipeElementResult> ExecuteInternalAsync(object args, PipelineState state);       
     }
 }

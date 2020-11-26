@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StackX.Pipeline
 {
@@ -11,16 +12,16 @@ namespace StackX.Pipeline
     public abstract class Filter<TInput> : PipeElement, IFilter
     {
 
-        protected virtual PipeElementResult Execute(TInput input, PipelineState state)
+        protected virtual Task<PipeElementResult> ExecuteAsync(TInput input, PipelineState state)
         {
-            throw new NotImplementedException(nameof(Execute));
+            throw new NotImplementedException(nameof(ExecuteAsync));
         }
 
-        internal override PipeElementResult ExecuteInternal(object args, PipelineState state)
+        internal override Task<PipeElementResult> ExecuteInternalAsync(object args, PipelineState state)
         {
             var converter = Converters.SingleOrDefault(t => t.CanConvert(args.GetType()));
             var input = converter == null ? args : converter.Convert(args);
-            return Execute((TInput)input, state);
+            return ExecuteAsync((TInput)input, state);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StackX.Pipeline
 {
@@ -39,15 +40,15 @@ namespace StackX.Pipeline
         /// <param name="args">Task Argument</param>
         /// <param name="state">Pipe state</param>
         /// <returns></returns>
-        protected abstract PipeElementResult Execute(TSArgs args, PipelineState state);
+        protected abstract Task<PipeElementResult> OnExecuteAsync(TSArgs args, PipelineState state);
         
-        internal override PipeElementResult ExecuteInternal(object args, PipelineState state)
+        internal override async Task<PipeElementResult> ExecuteInternalAsync(object args, PipelineState state)
         {
             try
             {
                 var converter = Converters.SingleOrDefault(t => t.CanConvert(args.GetType()));
                 var input = converter == null ? args : converter.Convert(args);
-                return Execute((TSArgs)input, state);
+                return await OnExecuteAsync((TSArgs)input, state);
             }
             catch (Exception ex)
             {

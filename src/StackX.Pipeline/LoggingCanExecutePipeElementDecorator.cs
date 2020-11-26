@@ -1,6 +1,7 @@
 ﻿using ServiceStack.Logging;
 using ServiceStack.Text;
 using System;
+using System.Threading.Tasks;
 
 namespace StackX.Pipeline
 {
@@ -20,13 +21,13 @@ namespace StackX.Pipeline
 
         public bool IsLoggingEnabled { get; private set; }
 
-        internal override PipeElementResult ExecuteInternal(object args, PipelineState state)
+        internal override async Task<PipeElementResult> ExecuteInternalAsync(object args, PipelineState state)
         {
             if (!IsLoggingEnabled)
-                return _element.ExecuteInternal(args, state);
+                return await _element.ExecuteInternalAsync(args, state);
             try
             {
-                var res = _element.ExecuteInternal(args, state);
+                var res = await _element.ExecuteInternalAsync(args, state);
                 if(_logger.IsDebugEnabled)
                     _logger.Debug($"ExecuteAsyncInternal result={res}, args={JsonSerializer.SerializeToString(args)}");
                 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace StackX.Pipeline
 {
@@ -21,20 +22,20 @@ namespace StackX.Pipeline
             _restartCountLimit = restartCountLimit;
         }
 
-        public PipeElementResult Run(TInput input)
+        public async Task<PipeElementResult> RunAsync(TInput input)
         {
             _defaultStatusManager.Reset();
             _defaultStatusManager.SetInitialInput(input);
-            return RunInternal(input);
+            return await RunInternalAsync(input);
         }
 
-        private PipeElementResult OnRestart(PipeRestartResult result, PipelineState state)
+        private async Task<PipeElementResult> OnRestartAsync(PipeRestartResult result, PipelineState state)
         {
             if (_restartCountLimit.HasValue && _defaultStatusManager.RestartCount > _restartCountLimit.Value - 1)
                 return new PipeRestartLimitReachedResult { Result = result };
             var value = TryExecuteRestartFilter(result, state);
             _defaultStatusManager.IncRestartCount();
-            return RunInternal(@value);
+            return await RunInternalAsync(@value);
         }
 
         private object TryExecuteRestartFilter(PipeRestartResult result, PipelineState state)
@@ -42,12 +43,12 @@ namespace StackX.Pipeline
             var @value = result.Result;
             if (_restartFilter != null)
             {
-                @value = _restartFilter.ExecuteInternal(result,state).Result;
+                @value = _restartFilter.ExecuteInternalAsync(result,state).Result;
             }
             return value;
         }
 
-        private PipeElementResult RunInternal(object input)
+        private async Task<PipeElementResult> RunInternalAsync(object input)
         {
             PipeElementResult result = new PipeSuccessResult {Result = input};
             var pipeState = _defaultStatusManager.BuildPipelineState(result);
@@ -57,11 +58,11 @@ namespace StackX.Pipeline
                 bool canExecute = CheckCanExecute(element, result.Result, pipeState);
                 if (!canExecute)
                     continue;
-                result = element.ExecuteInternal(result.Result, pipeState);
+                result = await element.ExecuteInternalAsync(result.Result, pipeState);
 
                 if (result is PipeErrorResult errorResult)
                 {
-                    result = _errorHandler.ExecuteInternal(errorResult);
+                    result = await _errorHandler.ExecuteInternalAsync(errorResult);
                     if (result is PipeErrorResult)
                     {
                         break;
@@ -76,7 +77,7 @@ namespace StackX.Pipeline
             }
 
             if (result is PipeRestartResult restartResult)
-                result = OnRestart(restartResult, pipeState);
+                result = await OnRestartAsync(restartResult, pipeState);
             return result;
         }
 

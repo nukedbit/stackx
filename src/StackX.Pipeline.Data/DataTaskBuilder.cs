@@ -4,6 +4,7 @@ using ServiceStack.OrmLite.Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace StackX.Pipeline.Data
 {
@@ -82,7 +83,7 @@ namespace StackX.Pipeline.Data
             }
         }
         
-        protected override PipeElementResult Execute(TArgs args, PipelineState state)
+        protected override async Task<PipeElementResult> OnExecuteAsync(TArgs args, PipelineState state)
         {
             var expression = _builder(new QueryBuilderArgs<TTable, TArgs>(Db.From<TTable>(), args));
 

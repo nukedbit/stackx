@@ -1,10 +1,12 @@
-﻿namespace StackX.Pipeline
+﻿using System.Threading.Tasks;
+
+namespace StackX.Pipeline
 {
     public class DefaultErrorHandler : ErrorHandler
     {
-        protected override PipeElementResult Execute(PipeErrorResult error)
+        protected override Task<PipeElementResult> OnExecuteAsync(PipeErrorResult error)
         {
-            return error;
+            return Task.FromResult<PipeElementResult>(error);
         }
     }
 }
