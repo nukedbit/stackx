@@ -1,6 +1,7 @@
 ﻿using ServiceStack.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StackX.Flow
 {
@@ -62,12 +63,31 @@ namespace StackX.Flow
 
         public FlowBuilder Add(FlowElement element)
         {
+            if (UnWrap(_pipelineElements.LastOrDefault()) is DecisionElement)
+            {
+                throw new ArgumentException("You can't add another element after a Decision");
+            }
             AddDecorated(element);
             return this;
         }
+
+        private FlowElement UnWrap(FlowElement element)
+        {
+            if (element is LoggingFlowElementDecorator el)
+            {
+                return el.WrappedElement;
+            }
+
+            return element;
+        }
+        
         public FlowBuilder Add<TElement>()
             where TElement : FlowElement
         {
+            if (UnWrap(_pipelineElements.LastOrDefault()) is DecisionElement)
+            {
+                throw new ArgumentException("You can't add another element after a Decision");
+            }
             var newElement = Activator.CreateInstance<TElement>();
             AddDecorated(newElement);
             return this;

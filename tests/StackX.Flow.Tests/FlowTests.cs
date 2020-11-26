@@ -177,5 +177,69 @@ namespace StackX.Pipeline.Tests
             result.Result.Should()
                 .BeOfType<Person>();
         }
+
+
+        class FakeElementReturnA : FlowElement<int>
+        {
+            protected override async Task<FlowElementResult> OnExecuteAsync(int args, FlowState state)
+            {
+                return this.Success("A");
+            }
+        }
+        
+        class FakeElementReturnB : FlowElement<int>
+        {
+            protected override async Task<FlowElementResult> OnExecuteAsync(int args, FlowState state)
+            {
+                return this.Success("B");
+            }
+        }
+        
+        
+        [Test]
+        public async Task FlowShouldReturnA()
+        {
+            var builder = new FlowBuilder()
+                .Add(DecisionBuilder.New<int>().Decision(async value => value == 1)
+                    .SetBranches(
+                        new List<FlowElement> {new FakeElementReturnA()},
+                        new List<FlowElement> {new FakeElementReturnB()}
+                    ).Build());
+
+            var pipeline = builder.Build<int>();
+
+            var result = await pipeline.RunAsync(1);
+
+            result
+                .Should()
+                .BeOfType<FlowSuccessResult>()
+                .Which.Result.Should().Be("A");
+        }
+        
+        [Test]
+        public async Task FlowThrowAddingElementAfterDecisionNew()
+        {
+            Assert.Throws<ArgumentException>(() => new FlowBuilder()
+                .Add(DecisionBuilder.New<int>().Decision(async value => value == 1)
+                    .SetBranches(
+                        new List<FlowElement>(),
+                        new List<FlowElement>()).Build()
+                )
+                .Add(new FakeElementReturnA())
+            ).Message.Should().Be("You can't add another element after a Decision");
+        }
+        
+        [Test]
+        public async Task FlowThrowAddingElementAfterDecisionCreateInstance()
+        {
+            Assert.Throws<ArgumentException>(() => new FlowBuilder()
+                .Add(DecisionBuilder.New<int>().Decision(async value => value == 1)
+                    .SetBranches(
+                        new List<FlowElement>(),
+                        new List<FlowElement>()).Build()
+                )
+                .Add<FakeElementReturnA>()
+            ).Message.Should().Be("You can't add another element after a Decision");
+        }
     }
 }

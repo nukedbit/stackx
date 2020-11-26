@@ -10,6 +10,8 @@ namespace StackX.Flow
         private readonly ILog _logger;
         private readonly FlowElement _element;
 
+        internal FlowElement WrappedElement => _element;
+
         public LoggingFlowElementDecorator(FlowElement element)
         {
             _logger = LogManager.GetLogger(element.GetType());

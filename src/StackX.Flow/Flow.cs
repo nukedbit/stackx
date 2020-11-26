@@ -52,13 +52,27 @@ namespace StackX.Flow
         {
             FlowElementResult result = new FlowSuccessResult {Result = input};
             var pipeState = _defaultStatusManager.BuildPipelineState(result);
-            foreach (var element in _elements)
+            var elements = _elements;
+            decision:
+            var enumerator = elements.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-
+                var element = enumerator.Current;
                 bool canExecute = CheckCanExecute(element, result.Result, pipeState);
                 if (!canExecute)
                     continue;
-                result = await element.ExecuteInternalAsync(result.Result, pipeState);
+                
+                if (element is FlowElement flowElement)
+                {
+                    var r = await flowElement.ExecuteInternalAsync(result.Result, pipeState);
+                    if (r is DecisionFlowElementSuccess decisionResult)
+                    {
+                        elements = decisionResult.Result as List<FlowElement>;
+                        goto decision;
+                    }
+
+                    result = r;
+                }
 
                 if (result is FlowErrorResult errorResult)
                 {
@@ -86,7 +100,7 @@ namespace StackX.Flow
             return result is FlowGoToEndResult || result is FlowRestartResult || result is FlowRestartLimitReachedResult;
         }
 
-        private static bool CheckCanExecute(FlowElement element, object currentInput, FlowState state)
+        private static bool CheckCanExecute(IFlowElement element, object currentInput, FlowState state)
         {
             try
             {
