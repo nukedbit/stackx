@@ -96,6 +96,7 @@ namespace StackX.Pipeline.Tests
                         .SetConnection(db)
                         .Read<Person, int>()
                         .Query(args => args.Expression.Where(p => p.Id == args.PipeArgs))
+                        .AsList()
                         .Build()
                 ).Build<int>();
 
@@ -122,8 +123,9 @@ namespace StackX.Pipeline.Tests
                     DataTaskBuilder.New()
                         .SetConnection(db)
                         .Read<Person, int>()
-                        .OnEmptyRaiseError()
                         .Query(args => args.Expression.Where(p => p.Id == args.PipeArgs))
+                        .OnEmptyOrNullRaiseError()
+                        .AsList()
                         .Build()
                 ).Build<int>();
 
@@ -132,6 +134,47 @@ namespace StackX.Pipeline.Tests
             result.Should()
                 .BeOfType<PipeErrorResult>()
                 .Which.ErrorObject.Should().Be("no results found");
+        }
+        
+        
+        [Test]
+        public async Task ExecuteQueryAsSingleReturnOneResult()
+        {
+            var factory = new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider);
+
+            var db = await factory.OpenDbConnectionAsync();
+            db.CreateTable<Person>();
+            db.Save(new Person()
+            {
+                Name = "Mario"
+            });
+
+            db.Save(new Person()
+            {
+                Name = "Princess"
+            });
+            
+            db.Save(new Person()
+            {
+                Name = "Luigi"
+            });
+            
+            var pipeline = new PipelineBuilder()
+                .Add(
+                    DataTaskBuilder.New()
+                        .SetConnection(db)
+                        .Read<Person, int>()
+                        .Query(args => args.Expression.Limit(1))
+                        .AsSingle()
+                        .Build()
+                ).Build<int>();
+
+            var result = await pipeline.RunAsync(2);
+
+            result.Should()
+                .BeOfType<PipeSuccessResult>();
+            result.Result.Should()
+                .BeOfType<Person>();
         }
     }
 }
