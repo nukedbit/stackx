@@ -49,7 +49,7 @@ namespace StackX.Pipeline
 
         private PipeElementResult RunInternal(object input)
         {
-            var result = PipeElementResult.Success(input);
+            PipeElementResult result = new PipeSuccessResult {Result = input};
             var pipeState = _defaultStatusManager.BuildPipelineState(result);
             foreach (var element in _elements)
             {
@@ -59,9 +59,9 @@ namespace StackX.Pipeline
                     continue;
                 result = element.ExecuteInternal(result.Result, pipeState);
 
-                if (result is PipeErrorResult)
+                if (result is PipeErrorResult errorResult)
                 {
-                    result = _errorHandler.ExecuteInternal((PipeErrorResult)result);
+                    result = _errorHandler.ExecuteInternal(errorResult);
                     if (result is PipeErrorResult)
                     {
                         break;
@@ -75,8 +75,8 @@ namespace StackX.Pipeline
                 pipeState = _defaultStatusManager.BuildPipelineState(result);
             }
 
-            if (result is PipeRestartResult)
-                result = OnRestart((PipeRestartResult)result, pipeState);
+            if (result is PipeRestartResult restartResult)
+                result = OnRestart(restartResult, pipeState);
             return result;
         }
 

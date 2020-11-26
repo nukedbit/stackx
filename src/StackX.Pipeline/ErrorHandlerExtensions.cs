@@ -6,27 +6,27 @@ namespace StackX.Pipeline
     {
         public static PipeElementResult Success<TResult>(this ErrorHandler errorHandler, [NotNull]TResult result)
         {
-            return PipeElementResult.Success(result);
+            return new PipeSuccessResult() { Result = result };
         }
 
         public static PipeElementResult Error<TResult>(this ErrorHandler errorHandler, [NotNull]TResult error)
         {
-            return PipeElementResult.Error(error);
+            return new PipeErrorResult() {ErrorObject = error};
         }
         
         public static PipeElementResult Error<TResult, TError>(this ErrorHandler errorHandler, [NotNull]TError error, [NotNull]TResult result)
         {
-            return PipeElementResult.Error(error, result);
+            return new PipeErrorResult() {ErrorObject = error, Result = result};
         }
         
         public static PipeElementResult GoToEnd<TResult>(this ErrorHandler errorHandler, [NotNull]TResult result)
         {
-            return PipeElementResult.GoToEnd(result);
+            return new PipeGoToEndResult() {Result = result};
         }
         
         public static PipeElementResult Restart<TResult>(this ErrorHandler errorHandler, [NotNull]TResult result)
         {
-            return PipeElementResult.Restart(result);
+            return new PipeRestartResult() {Result = result};
         }
     }
 }

@@ -4,29 +4,30 @@ namespace StackX.Pipeline
 {
     public static class PipeElementExtensions
     {
-        public static PipeElementResult Success<TResult>(this IPipeElement element, [NotNull]TResult result)
+        public static PipeElementResult Success<TResult>(this IPipeElement element, [NotNull] TResult result)
         {
-            return PipeElementResult.Success(result);
+            return new PipeSuccessResult {Result = result};
         }
 
-        public static PipeElementResult Error<TResult>(this IPipeElement element, [NotNull]TResult error)
+        public static PipeElementResult Error<TResult>(this IPipeElement element, [NotNull] TResult error)
         {
-            return PipeElementResult.Error(error);
+            return new PipeErrorResult {ErrorObject = error};
         }
 
-        public static PipeElementResult Error<TResult, TError>(this IPipeElement element, [NotNull]TError error, [NotNull]TResult result)
+        public static PipeElementResult Error<TResult, TError>(this IPipeElement element, [NotNull] TError error,
+            [NotNull] TResult result)
         {
-            return PipeElementResult.Error(error, result);
-        }
-        
-        public static PipeElementResult GoToEnd<TResult>(this IPipeElement element, [NotNull]TResult result)
-        {
-            return PipeElementResult.GoToEnd(result);
+            return new PipeErrorResult {ErrorObject = error, Result = result};
         }
 
-        public static PipeElementResult Restart<TResult>(this IPipeElement element, [NotNull]TResult result)
+        public static PipeElementResult GoToEnd<TResult>(this IPipeElement element, [NotNull] TResult result)
         {
-            return PipeElementResult.Restart(result);
+            return new PipeGoToEndResult {Result = result};
+        }
+
+        public static PipeElementResult Restart<TResult>(this IPipeElement element, [NotNull] TResult result)
+        {
+            return new PipeRestartResult {Result = result};
         }
     }
 }
