@@ -2,6 +2,7 @@
 using ServiceStack.OrmLite;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
@@ -46,15 +47,17 @@ namespace StackX.Flow.Data
         public IReadQueryModifiers<TTable, TArgs> Query(string sql);
 
         public IReadQueryModifiers<TTable, TArgs> Query(string sql, object anonType);
+        
+        public IReadQueryModifiers<TTable, TArgs> Query(string sql, Dictionary<string, object> dic);
     }
 
     public interface IReadQueryModifiers<TTable, TArgs>
     {
         public IReadQueryModifiers<TTable, TArgs> OnEmptyOrNullRaiseError(string message = "no results found");
         
-        public IQueryPipeBuilder AsList();
+        public IQueryPipeBuilder List();
 
-        public IQueryPipeBuilder AsSingle();
+        public IQueryPipeBuilder Single();
     }
     
     public interface IQueryPipeBuilder
@@ -92,13 +95,19 @@ namespace StackX.Flow.Data
             return this;
         }
 
-        public IQueryPipeBuilder AsList()
+        public IReadQueryModifiers<TTable, TArgs> Query(string sql, Dictionary<string, object> dic)
+        {
+            _sqlSelect = new QuerySqlSelect(sql, dic);
+            return this;
+        }
+
+        public IQueryPipeBuilder List()
         {
             _selectType = SelectType.List;
             return this;
         }
         
-        public IQueryPipeBuilder AsSingle()
+        public IQueryPipeBuilder Single()
         {
             _selectType = SelectType.Single;
             return this;
@@ -154,55 +163,32 @@ namespace StackX.Flow.Data
         {
             var expression = _queryBuilder(new QueryBuilderArgs<TTable, TArgs>(Db.From<TTable>(), args));
 
-            object result = null;
-            if (_selectType == SelectType.List)
+            object result = (_queryBuilder, _querySqlSelect, _selectType) switch
             {
-                if (_queryBuilder is not null)
-                {
-                    result = await Db.SelectAsync(expression);
-                }
+                //List
+                (not null, null, SelectType.List) => await Db.SelectAsync(expression),
+                (null, {anonType: null}, SelectType.List) => await Db.SelectAsync<TTable>(_querySqlSelect.sql),
+                (null, {anonType: Dictionary<string, object> anonType}, SelectType.List) => await
+                    Db.SelectAsync<TTable>(
+                        _querySqlSelect.sql, anonType),
+                (null, not null, SelectType.List) => await Db.SelectAsync<TTable>(_querySqlSelect.sql,
+                    _querySqlSelect.anonType),
+                //Single
+                (not null, null, SelectType.Single) => await Db.SingleAsync(expression),
+                (null, {anonType: null}, SelectType.Single) => await Db.SingleAsync<TTable>(_querySqlSelect.sql),
+                (null, {anonType: Dictionary<string, object> anonType}, SelectType.Single) => await Db
+                    .SingleAsync<TTable>(
+                        _querySqlSelect.sql, anonType),
+                (null, not null, SelectType.Single) => await Db.SingleAsync<TTable>(_querySqlSelect.sql,
+                    _querySqlSelect.anonType)
+            };
 
-                if (_querySqlSelect is {anonType: null} query)
-                {
-                    result = await Db.SelectAsync<TTable>(query.sql);
-                }
-                else if(_querySqlSelect is { } q)
-                {
-                    result = await Db.SelectAsync<TTable>(q.sql, q.anonType);
-                }
-            }else if (_selectType == SelectType.Single)
+            return (result, _onEmptyOrNullRaiseError.IsNullOrEmpty()) switch
             {
-                if (_queryBuilder is not null)
-                {
-                    result = await Db.SingleAsync(expression);
-                }
-
-                if (_querySqlSelect is {anonType: null} query)
-                {
-                    result = await Db.SingleAsync<TTable>(query.sql);
-                }
-                else if(_querySqlSelect is { } q)
-                {
-                    result = await Db.SingleAsync<TTable>(q.sql, q.anonType);
-                }
-            }
-
-            if (!_onEmptyOrNullRaiseError.IsNullOrEmpty())
-            {
-                if ((result is IList {Count: 0}) || (result is TArgs[] {Length: 0}))
-                {
-                    return new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError};   
-                }
-
-                if (result is null)
-                {
-                    return new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError};
-                }
-            }
-            
-            return new FlowSuccessResult
-            {
-                Result = result
+                (result: IList {Count: 0}, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError},
+                (result: TArgs[] {Length: 0}, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError},
+                (null, true) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError},
+                _ => new FlowSuccessResult() {Result = result}
             };
         }
     }

@@ -97,7 +97,7 @@ namespace StackX.Pipeline.Tests
                         .SetConnection(db)
                         .Read<Person, int>()
                         .Query(args => args.Expression.Where(p => p.Id == args.PipeArgs))
-                        .AsList()
+                        .List()
                         .Build()
                 ).Build<int>();
 
@@ -126,7 +126,7 @@ namespace StackX.Pipeline.Tests
                         .Read<Person, int>()
                         .Query(args => args.Expression.Where(p => p.Id == args.PipeArgs))
                         .OnEmptyOrNullRaiseError()
-                        .AsList()
+                        .List()
                         .Build()
                 ).Build<int>();
 
@@ -166,7 +166,7 @@ namespace StackX.Pipeline.Tests
                         .SetConnection(db)
                         .Read<Person, int>()
                         .Query(args => args.Expression.Limit(1))
-                        .AsSingle()
+                        .Single()
                         .Build()
                 ).Build<int>();
 
