@@ -50,7 +50,8 @@ namespace StackX.ServiceInterface
                             ModifiedBy = GetSession().GetUserAuthName(),
                             ModifiedDate = DateTime.UtcNow
                         };
-                        await Db.InsertAsync(fileRecord);
+                        var a = await Db.InsertAsync(fileRecord, selectIdentity:true);
+                        fileRecord.Id = (int)a;
                         newFiles.Add(fileRecord);
                     }
 
