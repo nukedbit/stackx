@@ -31,7 +31,12 @@ namespace StackX.Flow.Data
         public IReadQueryBuilder<TTable,TArgs> Read<TTable,TArgs>()
         {
             return new DataTaskBuilderRead<TTable,TArgs>(_connection);
-        } 
+        }
+        
+        public IWriteQueryBuilder<TTable,TArgs> Write<TTable,TArgs>()
+        {
+            return new DataQueryWriteBuilder<TTable,TArgs>(_connection);
+        }
         
         internal DataTaskBuilder () {}
 
@@ -72,7 +77,7 @@ namespace StackX.Flow.Data
         private QuerySqlSelect _sqlSelect;
         private SelectType _selectType = SelectType.List;
         
-        internal DataTaskBuilderRead(IDbConnection connection)
+        internal DataTaskBuilderRead(IDbConnection? connection)
         {
             _connection = connection;
         }
@@ -135,7 +140,7 @@ namespace StackX.Flow.Data
     internal class DataQueryElement<TTable, TArgs> : FlowElement<TArgs>
     {
         private IDbConnection? _connection;
-        private readonly Func<QueryBuilderArgs<TTable, TArgs>, SqlExpression<TTable>> _queryBuilder;
+        private readonly Func<QueryBuilderArgs<TTable, TArgs>, SqlExpression<TTable>>? _queryBuilder;
         private readonly string? _onEmptyOrNullRaiseError;
         private readonly SelectType _selectType;
         private readonly QuerySqlSelect? _querySqlSelect;
@@ -161,35 +166,182 @@ namespace StackX.Flow.Data
         
         protected override async Task<FlowElementResult> OnExecuteAsync(TArgs args, FlowState state)
         {
-            var expression = _queryBuilder(new QueryBuilderArgs<TTable, TArgs>(Db.From<TTable>(), args));
+            var exp = _queryBuilder?.Invoke(new QueryBuilderArgs<TTable, TArgs>(Db.From<TTable>(), args));
 
-            object result = (_queryBuilder, _querySqlSelect, _selectType) switch
+            object result = (exp, _querySqlSelect, _selectType) switch
             {
                 //List
-                (not null, null, SelectType.List) => await Db.SelectAsync(expression),
-                (null, {anonType: null}, SelectType.List) => await Db.SelectAsync<TTable>(_querySqlSelect.sql),
-                (null, {anonType: Dictionary<string, object> anonType}, SelectType.List) => await
+                (SqlExpression<TTable> expression, null, SelectType.List) => await Db.SelectAsync(expression),
+                (null, {sql: string sql,anonType: null}, SelectType.List) => await Db.SelectAsync<TTable>(sql),
+                (null, {sql: string sql,anonType: Dictionary<string, object> anonType}, SelectType.List) => await
                     Db.SelectAsync<TTable>(
-                        _querySqlSelect.sql, anonType),
-                (null, not null, SelectType.List) => await Db.SelectAsync<TTable>(_querySqlSelect.sql,
-                    _querySqlSelect.anonType),
+                        sql, anonType),
+                (null, {sql: string sql, anonType: object anonType}, SelectType.List) => await Db.SelectAsync<TTable>(sql,
+                    anonType),
                 //Single
-                (not null, null, SelectType.Single) => await Db.SingleAsync(expression),
-                (null, {anonType: null}, SelectType.Single) => await Db.SingleAsync<TTable>(_querySqlSelect.sql),
-                (null, {anonType: Dictionary<string, object> anonType}, SelectType.Single) => await Db
+                (SqlExpression<TTable> expression, null, SelectType.Single) => await Db.SingleAsync(expression),
+                (null, {sql: string sql, anonType: null}, SelectType.Single) => await Db.SingleAsync<TTable>(sql),
+                (null, {sql: string sql, anonType: Dictionary<string, object> anonType}, SelectType.Single) => await Db
                     .SingleAsync<TTable>(
-                        _querySqlSelect.sql, anonType),
-                (null, not null, SelectType.Single) => await Db.SingleAsync<TTable>(_querySqlSelect.sql,
-                    _querySqlSelect.anonType)
+                        sql, anonType),
+                (null, {sql: string sql, anonType: object anonType}, SelectType.Single) => await Db.SingleAsync<TTable>(sql,
+                    anonType),
+                (_, _,_) => throw new ArgumentException("Action not supported")
             };
 
             return (result, _onEmptyOrNullRaiseError.IsNullOrEmpty()) switch
             {
-                (result: IList {Count: 0}, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError},
-                (result: TArgs[] {Length: 0}, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError},
-                (null, true) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError},
-                _ => new FlowSuccessResult() {Result = result}
+                (result: IList {Count: 0}, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError!},
+                (result: TArgs[] {Length: 0}, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError!},
+                (null, false) => new FlowErrorResult {ErrorObject = _onEmptyOrNullRaiseError!},
+                _ => new FlowSuccessResult() {Result = result!}
             };
+        }
+    }
+
+
+    public enum SaveAction
+    {
+        Save,
+        Update,
+        Insert
+    }
+    
+    public interface IWriteQueryBuilder<TTable, TArgs>
+    {
+        public IWriteQueryWriteActionMethodBuilder<TTable, TArgs> Map(Func<TArgs, List<TTable>> mapAction);
+        public IWriteQueryWriteActionMethodBuilder<TTable, TArgs> Map(Func<TArgs, TTable> mapAction);
+    }
+
+    public interface IWriteQueryWriteActionMethodBuilder<TTable, TArgs>
+    {
+        public IWriteQueryBuilderBuild Save();
+        public IWriteQueryBuilderBuild Update();
+        public IWriteQueryBuilderBuild Insert();
+        public IWriteQueryBuilderBuild Decision(Func<TArgs, TTable, SaveAction> decision);
+        public IWriteQueryBuilderBuild Decision(Func<TArgs, List<TTable>, SaveAction> decision);
+    }
+
+    public interface IWriteQueryBuilderBuild
+    {
+        public FlowElement Build();
+    }
+    
+    public class DataQueryWriteBuilder<TTable, TArgs> : IWriteQueryBuilder<TTable, TArgs>, 
+        IWriteQueryWriteActionMethodBuilder<TTable, TArgs>, IWriteQueryBuilderBuild
+    {
+        private readonly IDbConnection? _connection;
+        private object _mapAction;
+        private object _writeAction;
+        
+        internal DataQueryWriteBuilder(IDbConnection? connection) {
+            _connection = connection;
+        }
+
+        public IWriteQueryWriteActionMethodBuilder<TTable, TArgs> Map(Func<TArgs, List<TTable>> mapAction)
+        {
+            this._mapAction = mapAction;
+            return this;
+        }
+
+        public IWriteQueryWriteActionMethodBuilder<TTable, TArgs> Map(Func<TArgs, TTable> mapAction)
+        {
+            this._mapAction = mapAction;
+            return this;
+        }
+
+        public IWriteQueryBuilderBuild Save()
+        {
+            _writeAction = SaveAction.Save;
+            return this;
+        }
+
+        public IWriteQueryBuilderBuild Update()
+        {
+            _writeAction = SaveAction.Update;
+            return this;
+        }
+
+        public IWriteQueryBuilderBuild Insert()
+        {
+            _writeAction = SaveAction.Insert;
+            return this;
+        }
+
+        public IWriteQueryBuilderBuild Decision(Func<TArgs, TTable, SaveAction> decision)
+        {
+            _writeAction = decision;
+            return this;
+        }
+        
+        public IWriteQueryBuilderBuild Decision(Func<TArgs, List<TTable>, SaveAction> decision)
+        {
+            _writeAction = decision;
+            return this;
+        }
+
+        public FlowElement Build()
+        {
+            return new FlowElementImpl(_connection,_mapAction, _writeAction);
+        }
+        
+        private class FlowElementImpl: FlowElement<TArgs>
+        {
+            private IDbConnection? _connection;
+            private readonly object _mapAction;
+            private readonly object _writeAction;
+
+            public FlowElementImpl(IDbConnection? connection, object mapAction, object writeAction)
+            {
+                _connection = connection;
+                _mapAction = mapAction;
+                _writeAction = writeAction;
+            }
+
+            private IDbConnection Db
+            {
+                get
+                {
+                    return _connection ??= HostContext.AppHost.GetDbConnection();
+                }
+            }
+
+            protected override async Task<FlowElementResult> OnExecuteAsync(TArgs args, FlowState state)
+            {
+                var result = (_mapAction as Delegate)!.DynamicInvoke(args);
+                
+                var action = (_writeAction, result) switch
+                {
+                    (SaveAction act, _) => act,
+                    (Func<TArgs, TTable, SaveAction> decision, TTable record) => decision(args, record),
+                    (Func<TArgs, List<TTable>, SaveAction> decision, List<TTable> records) => decision(args, records),
+                    (_, _) => throw new ArgumentException("Invalid write action")
+                };
+
+                switch ((result, action))
+                {
+                    case (List<TTable> list, SaveAction.Insert):
+                        await Db.InsertAllAsync(list);
+                        break;
+                    case (List<TTable> list, SaveAction.Save):
+                        await Db.SaveAllAsync(list);
+                        break;
+                    case (List<TTable> list, SaveAction.Update):
+                        await Db.UpdateAsync(list);
+                        break;
+                    case (TTable table, SaveAction.Insert):
+                        await Db.InsertAsync(table);
+                        break;
+                    case (TTable table, SaveAction.Save):
+                        await Db.SaveAsync(table);
+                        break;
+                    case (TTable table, SaveAction.Update):
+                        await Db.UpdateAsync(table);
+                        break;
+                }
+
+                return new FlowSuccessResult() {Result = result};
+            }
         }
     }
 }

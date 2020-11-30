@@ -6,6 +6,7 @@
 # Build related
 tools/**
 !tools/packages.config
+.sonarqube
 
 .history/
 .iws
