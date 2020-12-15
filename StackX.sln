@@ -30,13 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.TestSelfHost", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Common", "src\StackX.Common\StackX.Common.csproj", "{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Flow", "src\StackX.Flow\StackX.Flow.csproj", "{C2959274-1356-4877-BD41-EA42521B381A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Flow.Data", "src\StackX.Flow.Data\StackX.Flow.Data.csproj", "{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{262EAEE7-065A-4223-8C43-17645B4A2D35}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackX.Flow.Tests", "tests\StackX.Flow.Tests\StackX.Flow.Tests.csproj", "{0CA105B0-35EB-41DA-8036-A85A340E3444}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,25 +60,12 @@ Global
 		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDA611C7-9D04-496E-9120-A45D0BD7F9DA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2959274-1356-4877-BD41-EA42521B381A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2959274-1356-4877-BD41-EA42521B381A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2959274-1356-4877-BD41-EA42521B381A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2959274-1356-4877-BD41-EA42521B381A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C27012A-36ED-4DF0-83AC-B74FEAC34B91}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0CA105B0-35EB-41DA-8036-A85A340E3444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0CA105B0-35EB-41DA-8036-A85A340E3444}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0CA105B0-35EB-41DA-8036-A85A340E3444}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0CA105B0-35EB-41DA-8036-A85A340E3444}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DA90BA77-7B75-4C6B-A5ED-DBE0CBA25861} = {262EAEE7-065A-4223-8C43-17645B4A2D35}
-		{0CA105B0-35EB-41DA-8036-A85A340E3444} = {262EAEE7-065A-4223-8C43-17645B4A2D35}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {07FE61F2-54C8-4DB8-BF92-50120A396F1F}
