@@ -4,6 +4,7 @@ using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using StackX.ServiceModel;
 using System;
+using System.IO;
 using File = StackX.ServiceModel.Types.File;
 
 namespace StackX.ServiceInterface
@@ -12,6 +13,11 @@ namespace StackX.ServiceInterface
     {
 
         public Func<FileUpload, string> UploadedFileFullPathBuilder = null;
+
+        public bool UseRandomFileName { get; set; } = false;
+
+
+        public Func<string> RandomFileName = Path.GetRandomFileName;
         
         public void Register(IAppHost appHost)
         {

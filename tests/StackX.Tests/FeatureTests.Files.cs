@@ -10,6 +10,50 @@ namespace StackX.Tests
 {
     public partial class FeaturesTests
     {
+        
+        [Test]
+        public void UploadFileRandom()
+        {
+            var random = appHost.GetPlugin<FileFeature>().RandomFileName;
+            try
+            {
+                appHost.GetPlugin<FileFeature>().UseRandomFileName = true;
+                appHost.GetPlugin<FileFeature>().RandomFileName = () => "random";
+                
+                ServiceConfig.Instance.DisableSubFolderCheck = true;
+                appHost.GetPlugin<FileFeature>().UploadedFileFullPathBuilder = null;
+                var client = CreateAdminAuthClient();
+
+                var memoryStream = new MemoryStream();
+
+                var writer = new StreamWriter(memoryStream);
+            
+                writer.Write("file content");
+                
+                memoryStream.Position = 0;
+
+                var request = new FileUpload()
+                {
+                    Folder = "folder",
+                    ApplicationId = 1,
+                };
+                var fname = "test.txt";
+                var response = client.PostFileWithRequest<FileUploadResponse>(memoryStream, fname, request);
+                var randomFileName = "random.txt";
+                response.Results.First().FileName.Should().Be(randomFileName);
+            
+                var fileFullPath =
+                    ServiceConfig.Instance.GetDefaultUploadFullFilePath(randomFileName, request.Folder);
+
+                appHost.VirtualFiles.GetFile(fileFullPath).Exists().Should().BeTrue();
+            }
+            finally
+            {
+                appHost.GetPlugin<FileFeature>().UseRandomFileName = false;
+                appHost.GetPlugin<FileFeature>().RandomFileName = random;
+            }
+        }
+        
         [Test]
         public void UploadFile()
         {
@@ -39,7 +83,6 @@ namespace StackX.Tests
             var fileFullPath =
                 ServiceConfig.Instance.GetDefaultUploadFullFilePath(fname, request.Folder);
 
-
             appHost.VirtualFiles.GetFile(fileFullPath).Exists().Should().BeTrue();
         }
         
@@ -67,7 +110,7 @@ namespace StackX.Tests
                 Folder = "folder",
                 ApplicationId = 1,
             };
-            var fname = "test.txt";
+            var fname = "custom.txt";
             var response = client.PostFileWithRequest<FileUploadResponse>(memoryStream, fname, request);
 
             response.Results.First().FileName.Should().Be(fname);
