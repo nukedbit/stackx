@@ -22,4 +22,13 @@ namespace StackX.ServiceModel
         public string ExtraAttribute3 { get; set; }
         public string ExtraAttribute4 { get; set; }
     }
+    
+    [ValidateIsAuthenticated]
+    [ValidateRequest(Condition = "HasRole('Admin') or HasRole('Contributor')")]
+    public class UpdateFileReferencedBy : UpdateAuditBase<File, FileUploadResponse>, IPut
+    {
+        public int Id { get; set; }
+
+        public string ReferencedBy { get; set; }
+    }
 }

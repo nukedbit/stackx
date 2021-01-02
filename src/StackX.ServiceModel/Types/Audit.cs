@@ -10,7 +10,7 @@ namespace StackX.ServiceModel.Types
 
     [ValidateIsAuthenticated]
     [AutoApply(Behavior.AuditModify)]
-    public abstract class UpdateAuditBase<Table, TResponse> : IUpdateDb<Table>, IReturn<TResponse> { }
+    public abstract class UpdateAuditBase<Table, TResponse> : IPatchDb<Table>, IReturn<TResponse> { }
 
 
     [ValidateIsAuthenticated]
