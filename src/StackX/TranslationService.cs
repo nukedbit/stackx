@@ -59,7 +59,7 @@ namespace StackX.ServiceInterface
                         LanguageId = t.LanguageId,
                         LanguageName = t.Language.Name,
                         IsDeleted = t.DeletedDate != null,
-                        IsMissing = false,
+                        IsMissing = string.IsNullOrEmpty(t.Value),
                     }).ToList()
                 };
                 var missingLanguages = languages.Where(l => !model.Translations.Any(t => t.LanguageId == l.Id));
