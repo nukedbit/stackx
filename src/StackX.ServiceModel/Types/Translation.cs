@@ -16,7 +16,7 @@ namespace StackX.ServiceModel.Types
         [Reference] public Language Language { get; set; }
         public int LanguageId { get; set; }
         
-        [CustomField("NVARCHAR(MAX)")]
+        [CustomField("{NMAX_TEXT}")]
         public string Value { get; set; }
     }
 }

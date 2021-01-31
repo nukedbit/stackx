@@ -3,7 +3,10 @@ using System.Net;
 using FluentAssertions;
 using NUnit.Framework;
 using ServiceStack;
+using ServiceStack.Data;
+using ServiceStack.OrmLite;
 using StackX.ServiceModel;
+using StackX.ServiceModel.Types;
 
 namespace StackX.Tests
 {
@@ -64,6 +67,8 @@ namespace StackX.Tests
         [Test]
         public void Create_Missing_Translation()
         {
+            var Db = appHost.GetContainer().Resolve<IDbConnectionFactory>().OpenDbConnection();
+            Db.DropAndCreateTable<Translation>();
             var client = CreateAdminAuthClient();
 
             client.Post(new CreateMissingTranslation()
