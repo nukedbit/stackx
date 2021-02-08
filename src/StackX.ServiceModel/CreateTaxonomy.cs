@@ -9,6 +9,7 @@ namespace StackX.ServiceModel
     public class CreateTaxonomy : CreateAuditBase<Taxonomy, TaxonomyResponse>
     {
         [ValidateNotEmpty] public string Name { get; set; }
+        public string Description { get; set; }
         [ValidateGreaterThan(0)] public int ApplicationId { get; set; }
         [ValidateGreaterThan(0)] public int? ParentId { get; set; }
         

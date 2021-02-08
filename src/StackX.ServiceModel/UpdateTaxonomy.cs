@@ -10,6 +10,7 @@ namespace StackX.ServiceModel
     {
         [ValidateGreaterThan(0)] public int Id { get; set; }
         [ValidateNotEmpty] public string Name { get; set; }
+        public string Description { get; set; }
         [ValidateGreaterThan(0)] public int ApplicationId { get; set; }
         [ValidateGreaterThan(0)] public int? ParentId { get; set; }
 
