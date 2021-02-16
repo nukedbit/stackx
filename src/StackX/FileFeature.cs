@@ -12,7 +12,7 @@ namespace StackX.ServiceInterface
     public class FileFeature : IPlugin
     {
 
-        public Func<FileUpload, string> UploadedFileFullPathBuilder = null;
+        public Func<IFileUploadAdditionalMetadata, string> UploadedFileFullPathBuilder = null;
 
         public bool UseRandomFileName { get; set; } = false;
 

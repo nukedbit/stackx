@@ -13,19 +13,24 @@ using File = System.IO.File;
 
 namespace StackX.ServiceInterface
 {
-    public class FileService : Service
-    {
-        public IAutoQueryDb AutoQuery { get; set; }
 
-        public async Task<object> PostAsync(FileUpload request)
+    public static class FileServiceExtensions
+    {
+        public static async Task<List<ServiceModel.Types.File>> StoreUploadedFilesAsync(this IRequest request,
+            IFileUploadAdditionalMetadata additionalMetadata)
         {
-            var feature = HostContext.GetPlugin<FileFeature>();
-            
-            List<ServiceModel.Types.File> newFiles = new();
-            using var trans = Db.OpenTransaction();
+            var db = HostContext.AppHost.GetDbConnection(request);
+            using var trans = db.OpenTransaction();
             try
             {
-                foreach (IHttpFile requestFile in Request.Files)
+                var feature = HostContext.GetPlugin<FileFeature>();
+
+                List<ServiceModel.Types.File> newFiles = new();
+                
+                var virtualFiles = HostContext.AppHost.VirtualFiles;
+                var session = await request.GetSessionAsync();
+                
+                foreach (IHttpFile requestFile in request.Files)
                 {
 
                     var fileNameFromReq = requestFile.FileName;
@@ -34,46 +39,68 @@ namespace StackX.ServiceInterface
                         fileNameFromReq = feature.RandomFileName() +
                                           Path.GetExtension(fileNameFromReq);
                     }
-                    var fileFullPath = ServiceConfig.Instance.GetDefaultUploadFullFilePath(fileNameFromReq, request.Folder);
+
+                    var fileFullPath =
+                        ServiceConfig.Instance.GetDefaultUploadFullFilePath(fileNameFromReq, additionalMetadata.Folder);
 
                     if (feature.UploadedFileFullPathBuilder is not null)
                     {
-                        fileFullPath = feature.UploadedFileFullPathBuilder?.Invoke(request);
+                        fileFullPath = feature.UploadedFileFullPathBuilder?.Invoke(additionalMetadata);
                     }
 
-                    VirtualFiles.WriteFile(fileFullPath, requestFile.InputStream);
+                    virtualFiles.WriteFile(fileFullPath, requestFile.InputStream);
 
                     var fileRecord = new ServiceModel.Types.File()
                     {
-                        ApplicationId = request.ApplicationId,
+                        ApplicationId = additionalMetadata.ApplicationId,
                         ContentType = requestFile.ContentType,
-                        ExtraAttribute1 = request.ExtraAttribute1,
-                        ExtraAttribute2 = request.ExtraAttribute2,
-                        ExtraAttribute3 = request.ExtraAttribute3,
-                        ExtraAttribute4 = request.ExtraAttribute4,
+                        ExtraAttribute1 = additionalMetadata.ExtraAttribute1,
+                        ExtraAttribute2 = additionalMetadata.ExtraAttribute2,
+                        ExtraAttribute3 = additionalMetadata.ExtraAttribute3,
+                        ExtraAttribute4 = additionalMetadata.ExtraAttribute4,
                         FileName = Path.GetFileName(fileFullPath),
-                        ReferencedBy = request.ReferencedBy,
+                        ReferencedBy = additionalMetadata.ReferencedBy,
                         FileHash = requestFile.InputStream.ComputeFileMd5(),
-                        CreatedBy = GetSession().GetUserAuthName(),
+                        CreatedBy = session.GetUserAuthName(),
                         CreatedDate = DateTime.UtcNow,
-                        ModifiedBy = GetSession().GetUserAuthName(),
+                        ModifiedBy = session.GetUserAuthName(),
                         ModifiedDate = DateTime.UtcNow
                     };
-                    var a = await Db.InsertAsync(fileRecord, selectIdentity:true);
+                    var a = await db.InsertAsync(fileRecord, selectIdentity: true);
                     fileRecord.Id = (int)a;
                     newFiles.Add(fileRecord);
                 }
 
                 trans.Commit();
+                return newFiles;
             }
             catch (Exception e)
             {
                 trans.Rollback();
+                throw;
+            }
+        }
+    }
+    
+    public class FileService : Service
+    {
+        public IAutoQueryDb AutoQuery { get; set; }
+
+
+        public async Task<object> PostAsync(FileUpload request)
+        {
+            List<ServiceModel.Types.File> newFiles = new();
+            using var trans = Db.OpenTransaction();
+            try
+            {
+                newFiles = await Request.StoreUploadedFilesAsync(request);
+            }
+            catch (Exception e)
+            {
                 throw new HttpError(HttpStatusCode.InternalServerError, e);
             }
 
             return new FileUploadResponse() {Ids = newFiles.Select(f => f.Id).ToList(), Results = newFiles};
-
         }
 
         public async Task<object> Get(GoToFileUrl request)
