@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ServiceStack" Version="5.10.2" />
-      <PackageReference Include="ServiceStack.OrmLite" Version="5.10.2" />
-      <PackageReference Include="ServiceStack.Server" Version="5.10.2" /> 
+      <PackageReference Include="ServiceStack" Version="5.10.5" />
+      <PackageReference Include="ServiceStack.OrmLite" Version="5.10.5" />
+      <PackageReference Include="ServiceStack.Server" Version="5.10.5" /> 
     </ItemGroup>
 
     <ItemGroup>
